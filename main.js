@@ -5,7 +5,7 @@ const Gameboard = (function () {
   const getBoard = () => boardState;
 
   const updateBoard = (index, playerToken) => {
-    if (boardState[index] != " ") {
+    if (boardState[index] !== " ") {
       console.log("Cell already occupied.");
       return false;
     } else {
@@ -38,7 +38,7 @@ function Player(name, token) {
 }
 
 // Function to control the flow of the game
-function GameController() {
+const GameController = (function () {
   const player1 = Player("Bob", "x");
   const player2 = Player("Sue", "o");
   const winningLines = [
@@ -59,7 +59,7 @@ function GameController() {
     activePlayer = activePlayer === player1 ? player2 : player1;
   };
 
-  const checkGameEnd = (activePlayer) => {
+  const checkGameOver = (activePlayer) => {
     const board = Gameboard.getBoard();
 
     for (let i = 0; i < winningLines.length; i++) {
@@ -76,8 +76,9 @@ function GameController() {
       }
 
       if (playerWon) {
-        console.log(activePlayer.name + " wins!!!");
+        console.log(`${activePlayer.name} wins!!!`);
         gameover = true;
+        return;
       }
     }
 
@@ -89,27 +90,27 @@ function GameController() {
 
   const playRound = () => {
     while (!gameover) {
-      let validChoice = false;
-      let playerChoice = prompt(activePlayer.name + " please pick a cell from 1 to 9");
-      let index = parseInt(playerChoice) - 1;
-      while (index > 8 || index < 0 || isNaN(index)) {
-        playerChoice = prompt("Invalid input. Please pick a cell from 1 to 9 ");
+      let index = -1;
+
+      while (
+        isNaN(index) ||
+        index < 0 ||
+        index > 8 ||
+        !Gameboard.updateBoard(index, activePlayer.token)
+      ) {
+        const playerChoice = prompt(`${activePlayer.name}, please pick a cell from 1 to 9`);
         index = parseInt(playerChoice) - 1;
       }
 
-      validChoice = Gameboard.updateBoard(index, activePlayer.token);
-
-      if (validChoice) {
-        Gameboard.printBoard();
-        checkGameEnd(activePlayer);
-        switchActivePlayer();
-      }
+      Gameboard.printBoard();
+      checkGameOver(activePlayer);
+      switchActivePlayer();
     }
   };
 
   playRound();
 
-  return {};
-}
+  return {playRound};
+})();
 
-const game = GameController();
+// const game = GameController();
