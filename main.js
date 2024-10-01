@@ -39,8 +39,10 @@ function Player(name, token) {
 
 // Function to control the flow of the game
 function GameController() {
-  const player1 = Player("Player 1", "X");
-  const player2 = Player("Player 2", "O");
+  const p1name = prompt("Please enter first players name");
+  const p2name = prompt("Please enter second players name");
+  const player1 = Player(p1name, "X");
+  const player2 = Player(p2name, "O");
   const winningLines = [
     [0, 1, 2],
     [3, 4, 5],
@@ -66,7 +68,8 @@ function GameController() {
     Gameboard.resetBoard();
     gameover = false;
     activePlayer = player1;
-  }
+    gameoverText = "";
+  };
 
   const checkGameOver = (activePlayer) => {
     const board = Gameboard.getBoard();
@@ -126,7 +129,8 @@ const DisplayController = (function () {
 
   const updateScreen = () => {
     const board = Gameboard.getBoard();
-    boardDiv.innerHTML = "";
+    boardDiv.textContent = "";
+    gameoverDiv.textContent = "";
     const gameoverText = game.getGameoverText();
 
     const activePlayer = game.getActivePlayer();
@@ -141,7 +145,8 @@ const DisplayController = (function () {
     });
 
     if (gameoverText !== "") {
-        gameoverDiv.textContent = gameoverText;
+      gameoverDiv.textContent = gameoverText;
+      playerDiv.textContent = "Game Over";
     }
   };
 
@@ -153,8 +158,8 @@ const DisplayController = (function () {
 
   resetButton.addEventListener("click", () => {
     game.resetGamestate();
-    updateScreen();    
-  })
-  
+    updateScreen();
+  });
+
   updateScreen();
 })();
