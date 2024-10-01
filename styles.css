@@ -1,0 +1,28 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    font-family: monospace;
+}
+
+.player {
+    font-size: 24px;
+}
+
+.board {
+    display: grid;
+    height: 300px;
+    width: 300px;
+    grid-template-rows: repeat(3, 1fr);
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.cell {
+    border: 1pt solid red;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 75px;
+    font-weight: bold;
+}

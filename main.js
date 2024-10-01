@@ -38,9 +38,9 @@ function Player(name, token) {
 }
 
 // Function to control the flow of the game
-const GameController = (function () {
-  const player1 = Player("Bob", "x");
-  const player2 = Player("Sue", "o");
+function GameController() {
+  const player1 = Player("Player 1", "X");
+  const player2 = Player("Player 2", "O");
   const winningLines = [
     [0, 1, 2],
     [3, 4, 5],
@@ -58,6 +58,8 @@ const GameController = (function () {
   const switchActivePlayer = () => {
     activePlayer = activePlayer === player1 ? player2 : player1;
   };
+
+  const getActivePlayer = () => activePlayer;
 
   const checkGameOver = (activePlayer) => {
     const board = Gameboard.getBoard();
@@ -88,29 +90,48 @@ const GameController = (function () {
     }
   };
 
-  const playRound = () => {
-    while (!gameover) {
-      let index = -1;
+  const playRound = (index) => {
+    if (!gameover) {
+      let valid = Gameboard.updateBoard(index, activePlayer.token);
 
-      while (
-        isNaN(index) ||
-        index < 0 ||
-        index > 8 ||
-        !Gameboard.updateBoard(index, activePlayer.token)
-      ) {
-        const playerChoice = prompt(`${activePlayer.name}, please pick a cell from 1 to 9`);
-        index = parseInt(playerChoice) - 1;
+      if (valid) {
+        Gameboard.printBoard();
+        checkGameOver(activePlayer);
+        switchActivePlayer();
       }
-
-      Gameboard.printBoard();
-      checkGameOver(activePlayer);
-      switchActivePlayer();
     }
   };
 
-  playRound();
+  return { playRound, getActivePlayer };
+}
 
-  return {playRound};
+// IIFE to control the display of the UI
+const DisplayController = (function () {
+  const game = GameController();
+  const boardDiv = document.querySelector(".board");
+  const playerDiv = document.querySelector(".player");
+
+  const updateScreen = () => {
+    const board = Gameboard.getBoard();
+    boardDiv.innerHTML = "";
+
+    const activePlayer = game.getActivePlayer();
+    playerDiv.textContent = `${activePlayer.name}'s turn`;
+
+    board.forEach((token, index) => {
+      const cell = document.createElement("div");
+      cell.textContent = token;
+      cell.classList.add("cell");
+      cell.id = index;
+      boardDiv.appendChild(cell);
+    });
+  };
+
+  boardDiv.addEventListener("click", (event) => {
+    const index = event.target.id;
+    game.playRound(index);
+    updateScreen();
+  });
+
+  updateScreen();
 })();
-
-// const game = GameController();
