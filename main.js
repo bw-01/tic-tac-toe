@@ -54,12 +54,19 @@ function GameController() {
 
   let gameover = false;
   let activePlayer = player1;
+  let gameoverText = "";
 
   const switchActivePlayer = () => {
     activePlayer = activePlayer === player1 ? player2 : player1;
   };
 
   const getActivePlayer = () => activePlayer;
+
+  const resetGamestate = () => {
+    Gameboard.resetBoard();
+    gameover = false;
+    activePlayer = player1;
+  }
 
   const checkGameOver = (activePlayer) => {
     const board = Gameboard.getBoard();
@@ -79,6 +86,7 @@ function GameController() {
 
       if (playerWon) {
         console.log(`${activePlayer.name} wins!!!`);
+        gameoverText = `${activePlayer.name} wins!!!`;
         gameover = true;
         return;
       }
@@ -86,9 +94,12 @@ function GameController() {
 
     if (!gameover && Gameboard.boardFull()) {
       console.log("It's a draw!");
+      gameoverText = "It's a draw!";
       gameover = true;
     }
   };
+
+  const getGameoverText = () => gameoverText;
 
   const playRound = (index) => {
     if (!gameover) {
@@ -102,7 +113,7 @@ function GameController() {
     }
   };
 
-  return { playRound, getActivePlayer };
+  return { playRound, getActivePlayer, resetGamestate, getGameoverText };
 }
 
 // IIFE to control the display of the UI
@@ -110,10 +121,13 @@ const DisplayController = (function () {
   const game = GameController();
   const boardDiv = document.querySelector(".board");
   const playerDiv = document.querySelector(".player");
+  const resetButton = document.getElementById("reset");
+  const gameoverDiv = document.querySelector(".gameover");
 
   const updateScreen = () => {
     const board = Gameboard.getBoard();
     boardDiv.innerHTML = "";
+    const gameoverText = game.getGameoverText();
 
     const activePlayer = game.getActivePlayer();
     playerDiv.textContent = `${activePlayer.name}'s turn`;
@@ -125,6 +139,10 @@ const DisplayController = (function () {
       cell.id = index;
       boardDiv.appendChild(cell);
     });
+
+    if (gameoverText !== "") {
+        gameoverDiv.textContent = gameoverText;
+    }
   };
 
   boardDiv.addEventListener("click", (event) => {
@@ -133,5 +151,10 @@ const DisplayController = (function () {
     updateScreen();
   });
 
+  resetButton.addEventListener("click", () => {
+    game.resetGamestate();
+    updateScreen();    
+  })
+  
   updateScreen();
 })();
